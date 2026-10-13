@@ -4,6 +4,16 @@ import { SUPABASE_KEY, SUPABASE_URL, isConfigured } from "@/lib/supabase/env";
 
 // Keeps the admin login session fresh on every page request.
 export async function proxy(request: NextRequest) {
+  // If Supabase sends a sign-in link to any page other than /auth/confirm (it falls back to
+  // the Site URL when the redirect isn't on its allow list), finish the sign-in anyway.
+  const { pathname, searchParams } = request.nextUrl;
+  if ((searchParams.has("code") || searchParams.has("token_hash")) && pathname !== "/auth/confirm") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/confirm";
+    if (!url.searchParams.get("next")) url.searchParams.set("next", "/admin");
+    return NextResponse.redirect(url);
+  }
+
   let response = NextResponse.next({ request });
   if (!isConfigured()) return response;
 
