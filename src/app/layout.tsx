@@ -34,8 +34,9 @@ export const viewport: Viewport = {
   ],
 };
 
-// Applies the saved light/dark choice before the first paint.
-const THEME_SCRIPT = `try{var t=localStorage.getItem("patgpt-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}`;
+// Sets light or dark before the first paint: the visitor's own choice if they picked one
+// with the moon/sun button, otherwise their device's setting.
+const THEME_SCRIPT = `(function(){var t=null;try{t=localStorage.getItem("patgpt-theme")}catch(e){}if(t!=="dark"&&t!=="light"){try{t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}catch(e){t="light"}}document.documentElement.setAttribute("data-theme",t)})()`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isAdmin } = await getSession();

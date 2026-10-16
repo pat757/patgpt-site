@@ -4,35 +4,31 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { CATEGORIES } from "@/lib/site";
 import { catOf, extOf, fmtSize, slugify } from "@/lib/format";
-import { imageLine, storedImagesIn } from "@/lib/body";
-import { looksLikeImage } from "@/lib/images";
-import { checkFiles, removeStoredFiles, updateBreakdown, uploadFiles, uploadImage } from "@/lib/admin-actions";
+import { isHtmlBody, legacyToHtml, storedImagesIn } from "@/lib/body";
+import { checkFiles, removeStoredFiles, updateBreakdown, uploadFiles } from "@/lib/admin-actions";
 import { getBrowserClient } from "@/lib/supabase/client";
 import type { Breakdown } from "@/lib/types";
-import { PostBody } from "./PostBody";
+import { PostEditor, type PostEditorHandle } from "./editor/PostEditor";
 
 const ACCEPT = ".pdf,application/pdf,.md,.txt,.csv,.json,image/*,video/mp4,video/webm";
-const MAX_IMAGES = 30;
+const MAX_BODY = 50000; // matches the database limit in supabase/schema.sql
 
 type Status = { cls: "" | "ok" | "err"; text: string; href?: string };
-
-const tokenName = (name: string) => name.replace(/[[\]()\n]/g, "").slice(0, 60) || "image";
 
 /** Adding a new breakdown (no post) or editing a published one. */
 export function BreakdownForm({ post }: { post?: Breakdown }) {
   const editing = !!post;
   const router = useRouter();
-  const bodyRef = useRef<HTMLTextAreaElement>(null);
-  const imageInput = useRef<HTMLInputElement>(null);
+  const editor = useRef<PostEditorHandle>(null);
   // A new post gets its id as soon as its first image is uploaded, so the images live in its folder.
   const idRef = useRef<string | null>(post?.id ?? null);
   const uploadedHere = useRef(new Set<string>());
-  const pendingRef = useRef(0);
+  const [initialHtml] = useState(() => (post?.body ? (isHtmlBody(post.body) ? post.body : legacyToHtml(post.body)) : ""));
+  const [editorKey, setEditorKey] = useState(0);
   const [uploading, setUploading] = useState(0);
   const [pending, setPending] = useState<File[]>([]);
   const [over, setOver] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [status, setStatus] = useState<Status>({ cls: "", text: "" });
 
@@ -57,96 +53,7 @@ export function BreakdownForm({ post }: { post?: Breakdown }) {
     setDirty(true);
   };
 
-  /** Puts a block of text on its own lines at the cursor. Returns where the block starts and the caret after it. */
-  const insertBlock = (block: string) => {
-    const ta = bodyRef.current!;
-    const a = ta.selectionStart;
-    const z = ta.selectionEnd;
-    const v = ta.value;
-    const before = v.slice(0, a);
-    const after = v.slice(z);
-    const pre = before && !before.endsWith("\n\n") ? (before.endsWith("\n") ? "\n" : "\n\n") : "";
-    const tail = after.startsWith("\n\n") ? "" : after.startsWith("\n") ? "\n" : "\n\n";
-    ta.value = before + pre + block + tail + after;
-    setDirty(true);
-    return { start: before.length + pre.length, caret: (before + pre + block + tail).length };
-  };
-
-  const insertPrompt = () => {
-    const ta = bodyRef.current;
-    if (!ta) return;
-    const picked = ta.value.slice(ta.selectionStart, ta.selectionEnd).trim();
-    const inner = picked || "Paste your prompt here";
-    const { start } = insertBlock("```\n" + inner + "\n```");
-    ta.focus();
-    ta.setSelectionRange(start + 4, start + 4 + inner.length);
-  };
-
-  /** Swaps an "Uploading…" placeholder for the finished image line (or removes it). False if it was deleted meanwhile. */
-  const replaceToken = (token: string, line: string) => {
-    const ta = bodyRef.current;
-    if (!ta) return false;
-    const v = ta.value;
-    let start = v.indexOf(token);
-    if (start < 0) return false;
-    let end = start + token.length;
-    if (!line) {
-      if (v.slice(end, end + 2) === "\n\n") end += 2;
-      else if (v.slice(start - 2, start) === "\n\n") start -= 2;
-    }
-    const s = ta.selectionStart;
-    const e = ta.selectionEnd;
-    ta.value = v.slice(0, start) + line + v.slice(end);
-    const delta = line.length - (end - start);
-    const fix = (p: number) => (p >= end ? p + delta : p > start ? start + line.length : p);
-    ta.setSelectionRange(fix(s), fix(e));
-    return true;
-  };
-
-  const insertImages = async (files: File[]) => {
-    const ta = bodyRef.current;
-    if (!ta || !files.length) return;
-    const imgs = files.filter(looksLikeImage);
-    if (!imgs.length)
-      return setStatus({ cls: "err", text: "Only images can go in the post text. Attach PDFs and other files in the box below." });
-    if (storedImagesIn(ta.value).length + pendingRef.current + imgs.length > MAX_IMAGES)
-      return setStatus({ cls: "err", text: `A post can show up to ${MAX_IMAGES} images.` });
-
-    if (preview !== null) setPreview(null);
-    const tag = Date.now().toString(36);
-    const tokens = imgs.map((f, i) => `![Uploading ${tokenName(f.name)}…](uploading-${tag}-${i})`);
-    const { caret } = insertBlock(tokens.join("\n\n"));
-    ta.focus();
-    ta.setSelectionRange(caret, caret);
-
-    pendingRef.current += imgs.length;
-    setUploading(pendingRef.current);
-    setStatus({ cls: "", text: imgs.length === 1 ? "Uploading image…" : `Uploading ${imgs.length} images…` });
-    let failed = "";
-    for (let i = 0; i < imgs.length; i++) {
-      let path = "";
-      try {
-        path = await uploadImage(postId(), imgs[i]);
-        uploadedHere.current.add(path);
-      } catch (e) {
-        failed = e instanceof Error ? e.message : "An image didn't upload. Try again.";
-      }
-      if (!replaceToken(tokens[i], path ? imageLine(path) : "") && path) {
-        // The placeholder was deleted while uploading, so the image isn't wanted.
-        uploadedHere.current.delete(path);
-        removeStoredFiles([path]).catch(() => {});
-      }
-      pendingRef.current--;
-      setUploading(pendingRef.current);
-    }
-    setStatus(
-      failed
-        ? { cls: "err", text: failed }
-        : { cls: "ok", text: `${imgs.length === 1 ? "Image" : "Images"} added. To add a caption, type it between the [ ].` },
-    );
-  };
-
-  /** Removes images that were uploaded or used before but aren't in the saved text any more. */
+  /** Removes images that were uploaded or used before but aren't in the saved post any more. */
   const cleanUpImages = (savedBody: string, id: string) => {
     const used = new Set(storedImagesIn(savedBody));
     const attached = new Set((post?.files ?? []).map((f) => f.path));
@@ -158,11 +65,13 @@ export function BreakdownForm({ post }: { post?: Breakdown }) {
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (pendingRef.current > 0) return setStatus({ cls: "err", text: "Wait for the images to finish uploading." });
+    const body = editor.current?.getHtml();
+    if (body === null || uploading > 0) return setStatus({ cls: "err", text: "Wait for the images to finish uploading." });
+    if ((body || "").length > MAX_BODY)
+      return setStatus({ cls: "err", text: "This post is too long to save. Split it into two posts, or move some of it into a PDF." });
     const form = e.currentTarget;
     const fd = new FormData(form);
     const title = String(fd.get("title") || "").trim();
-    const body = (bodyRef.current?.value ?? "").trim();
     const link = String(fd.get("link") || "").trim();
     const fields = {
       title,
@@ -184,7 +93,7 @@ export function BreakdownForm({ post }: { post?: Breakdown }) {
       setStatus({ cls: "", text: "Saving…" });
       try {
         await updateBreakdown(post.id, fields);
-        cleanUpImages(body, post.id);
+        cleanUpImages(body || "", post.id);
         setDirty(false);
         setStatus({ cls: "ok", text: "Saved." });
         router.push(`/breakdowns/${post.slug}`);
@@ -214,12 +123,12 @@ export function BreakdownForm({ post }: { post?: Breakdown }) {
         .from("breakdowns")
         .insert({ id, slug, ...fields, files: uploaded });
       if (error) throw new Error(/row-level security/i.test(error.message) ? "Publishing was refused. Sign in again." : "Couldn't publish: " + error.message);
-      cleanUpImages(body, id);
+      cleanUpImages(body || "", id);
       idRef.current = null;
       form.reset();
-      if (bodyRef.current) bodyRef.current.value = "";
+      editor.current?.clear();
+      setEditorKey((k) => k + 1);
       setPending([]);
-      setPreview(null);
       setDirty(false);
       setStatus({ cls: "ok", text: "Published. It's live in Latest breakdowns.", href: `/breakdowns/${slug}` });
       router.refresh();
@@ -231,17 +140,24 @@ export function BreakdownForm({ post }: { post?: Breakdown }) {
     }
   };
 
-  const busyLabel = editing ? "Saving…" : "Publishing…";
-
   return (
     <div className="admin">
       <h2>{editing ? "Edit breakdown" : "Add a breakdown"}</h2>
       <p className="note">
         {editing
           ? "Change anything below and save. PDFs and other attached files are added or removed on the post page."
-          : "Write the post, put screenshots and photos anywhere in it, attach PDFs (they show inside the post with a viewer), add a link, or any mix."}
+          : "Write the post with the toolbar, paste or drop screenshots and photos anywhere in it, attach PDFs, add a link, or any mix."}
       </p>
-      <form className="grid2" onSubmit={submit} onInput={() => setDirty(true)}>
+      <form
+        className="grid2"
+        onSubmit={submit}
+        onInput={() => setDirty(true)}
+        // Pressing Enter in a single-line box (title, caption…) shouldn't publish the post by accident.
+        onKeyDown={(e) => {
+          const t = e.target as HTMLElement;
+          if (e.key === "Enter" && t.tagName === "INPUT" && (t as HTMLInputElement).type !== "submit") e.preventDefault();
+        }}
+      >
         <div className="full">
           <label htmlFor="rTitle">Title</label>
           <input id="rTitle" name="title" required maxLength={140} defaultValue={post?.title} placeholder="The perfect prompt formula: role, context, task, format" />
@@ -263,71 +179,21 @@ export function BreakdownForm({ post }: { post?: Breakdown }) {
           <textarea id="rDesc" name="description" maxLength={400} style={{ minHeight: 80 }} defaultValue={post?.description ?? ""} placeholder="One or two lines shown in the list" />
         </div>
         <div className="full">
-          <label htmlFor="rBody">Post{editing ? "" : " (optional)"}</label>
-          <div className="ins-row">
-            <button className="ins" type="button" onClick={insertPrompt} disabled={preview !== null}>
-              + Insert prompt box
-            </button>
-            <button className="ins" type="button" onClick={() => imageInput.current?.click()} disabled={preview !== null}>
-              + Insert image
-            </button>
-            <button
-              className="ins ins-preview"
-              type="button"
-              aria-pressed={preview !== null}
-              onClick={() => setPreview(preview === null ? (bodyRef.current?.value ?? "") : null)}
-            >
-              {preview === null ? "Preview" : "Back to editing"}
-            </button>
-          </div>
-          <input
-            ref={imageInput}
-            type="file"
-            className="sr"
-            multiple
-            accept="image/*"
-            tabIndex={-1}
-            aria-hidden="true"
-            onChange={(e) => {
-              const list = Array.from(e.target.files || []);
-              e.target.value = "";
-              insertImages(list);
-            }}
+          <span className="label">Post{editing ? "" : " (optional)"}</span>
+          <PostEditor
+            key={editorKey}
+            handle={editor}
+            initialHtml={editorKey === 0 ? initialHtml : ""}
+            getPostId={postId}
+            onChange={() => setDirty(true)}
+            onUploadsChange={setUploading}
+            onUploaded={(path) => uploadedHere.current.add(path)}
+            onMessage={(cls, text) => setStatus({ cls, text })}
           />
-          <textarea
-            id="rBody"
-            name="body"
-            ref={bodyRef}
-            hidden={preview !== null}
-            style={{ minHeight: 300 }}
-            defaultValue={post?.body ?? ""}
-            placeholder="Write the breakdown. Start a line with ## for a heading. Paste a screenshot (Ctrl/⌘+V) or click “Insert image” to put a picture where your cursor is."
-            onPaste={(e) => {
-              const files = Array.from(e.clipboardData?.files || []).filter(looksLikeImage);
-              if (!files.length) return;
-              e.preventDefault();
-              insertImages(files);
-            }}
-            onDragOver={(e) => {
-              if (e.dataTransfer.types.includes("Files")) e.preventDefault();
-            }}
-            onDrop={(e) => {
-              const files = Array.from(e.dataTransfer.files || []);
-              if (!files.length) return;
-              e.preventDefault();
-              e.currentTarget.focus();
-              insertImages(files);
-            }}
-          />
-          {preview !== null && (
-            <div className="preview" aria-label="Preview of the post">
-              {preview.trim() ? <PostBody text={preview} /> : <p className="muted">Nothing written yet.</p>}
-            </div>
-          )}
           <p className="hint">
             {uploading > 0
               ? `Uploading ${uploading} ${uploading === 1 ? "image" : "images"}… you can keep writing.`
-              : "Each image is a line like ![caption](…). Type a caption inside the [ ], or delete the line to remove the image."}
+              : "Tip: select text and use the toolbar, or shortcuts like Ctrl/⌘+B for bold. Type ## and a space for a heading, or - for a list. Press Enter three times to leave a prompt box."}
           </p>
         </div>
         {!editing && (
@@ -387,7 +253,7 @@ export function BreakdownForm({ post }: { post?: Breakdown }) {
         <div className="full">
           <div className="form-actions">
             <button className="btn" type="submit" disabled={busy || uploading > 0}>
-              {busy ? busyLabel : uploading > 0 ? "Uploading images…" : editing ? "Save changes" : "Publish"}
+              {busy ? (editing ? "Saving…" : "Publishing…") : uploading > 0 ? "Uploading images…" : editing ? "Save changes" : "Publish"}
             </button>
             {editing && (
               <Link className="btn outline" href={`/breakdowns/${post.slug}`}>

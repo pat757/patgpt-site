@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { CATEGORIES } from "@/lib/site";
-import { withoutImages } from "@/lib/body";
+import { plainText } from "@/lib/body";
 import { breakdownHref, catOf, fmtDate, isPdf, readMins } from "@/lib/format";
 import { deleteBreakdown } from "@/lib/admin-actions";
 import type { Breakdown } from "@/lib/types";
@@ -33,7 +33,7 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
     return posts.filter(
       (p) =>
         (cat === "All" || catOf(p) === cat) &&
-        (!q || [p.title, p.description, withoutImages(p.body), p.tags.join(" "), p.category].join(" ").toLowerCase().includes(q)),
+        (!q || [p.title, p.description, plainText(p.body), p.tags.join(" "), p.category].join(" ").toLowerCase().includes(q)),
     );
   }, [posts, cat, query]);
 

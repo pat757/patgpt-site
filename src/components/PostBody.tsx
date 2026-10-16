@@ -1,8 +1,17 @@
-import { parseBody } from "@/lib/body";
-import { CopyButton } from "./CopyButton";
+import { isHtmlBody, parseBody } from "@/lib/body";
 import { PostImage } from "./PostImage";
+import { PromptBox } from "./PromptBox";
+import { RichBody } from "./RichBody";
 
 export function PostBody({ text }: { text: string }) {
+  if (isHtmlBody(text))
+    return (
+      <div className="body">
+        <RichBody html={text} />
+      </div>
+    );
+
+  // Posts written before the visual editor existed.
   const blocks = parseBody(text);
   return (
     <div className="body">
@@ -10,17 +19,7 @@ export function PostBody({ text }: { text: string }) {
         if (b.kind === "h") return <h2 key={i}>{b.text}</h2>;
         if (b.kind === "p") return <p key={i}>{b.text}</p>;
         if (b.kind === "img") return <PostImage key={i} src={b.src} caption={b.caption} />;
-        return (
-          <div className="pbox" key={i}>
-            <div className="pbox-h">
-              <span>
-                Prompt {b.n} · {b.label || "Copy & paste"}
-              </span>
-              <CopyButton text={b.text} n={b.n} />
-            </div>
-            <pre>{b.text}</pre>
-          </div>
-        );
+        return <PromptBox key={i} n={b.n} label={b.label} text={b.text} />;
       })}
     </div>
   );

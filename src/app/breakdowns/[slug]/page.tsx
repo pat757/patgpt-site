@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { PostBody } from "@/components/PostBody";
 import { PostFiles } from "@/components/PostFiles";
 import { getBreakdown } from "@/lib/data";
-import { parseBody } from "@/lib/body";
+import { firstImageIn } from "@/lib/body";
 import { catOf, fmtDate, isImage, isPdf, readMins } from "@/lib/format";
 import { imageUrl } from "@/lib/storage";
 
@@ -16,9 +16,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: "Breakdown not found" };
   const description = post.description || `A ${catOf(post)} breakdown from PatGPT.`;
   // The first picture in the post becomes the preview image when the link is shared.
-  const firstInText = parseBody(post.body).find((b) => b.kind === "img");
   const firstAttached = post.files.find((f) => !isPdf(f) && isImage(f));
-  const cover = firstInText?.kind === "img" ? imageUrl(firstInText.src) : firstAttached ? imageUrl(firstAttached.path) : null;
+  const cover = firstImageIn(post.body) ?? (firstAttached ? imageUrl(firstAttached.path) : null);
   return {
     title: post.title,
     description,

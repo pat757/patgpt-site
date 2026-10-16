@@ -1,4 +1,4 @@
-import { withoutImages } from "./body";
+import { plainText } from "./body";
 import { CATEGORIES } from "./site";
 import type { Breakdown, StoredFile } from "./types";
 
@@ -32,7 +32,7 @@ export const catOf = (b: Pick<Breakdown, "category">) =>
   (CATEGORIES as readonly string[]).includes(b.category) ? b.category : "Other";
 
 export const readMins = (b: Pick<Breakdown, "body" | "description">) =>
-  Math.max(1, Math.round(`${withoutImages(b.body)} ${b.description || ""}`.split(/\s+/).filter(Boolean).length / 220));
+  Math.max(1, Math.round(`${plainText(b.body)} ${b.description || ""}`.split(/\s+/).filter(Boolean).length / 220));
 
 export const safeUrl = (u: string | null | undefined) => (u && /^https?:\/\//i.test(u) ? u : "");
 

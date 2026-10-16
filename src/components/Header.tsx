@@ -1,7 +1,18 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+
+const KEY = "patgpt-theme";
+const deviceTheme = (): "light" | "dark" => (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+function savedTheme() {
+  try {
+    const t = localStorage.getItem(KEY);
+    return t === "dark" || t === "light" ? t : null;
+  } catch {
+    return null;
+  }
+}
 
 function currentTheme(): "light" | "dark" {
   return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
@@ -16,11 +27,24 @@ export function Header({ isAdmin }: { isAdmin: boolean }) {
   const path = usePathname() || "/";
   const theme = useSyncExternalStore(subscribe, currentTheme, () => "light" as const);
 
+  // Follow the device's light/dark setting live, unless the visitor picked one with the button.
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const follow = () => {
+      if (!savedTheme()) document.documentElement.setAttribute("data-theme", deviceTheme());
+    };
+    follow();
+    mq.addEventListener("change", follow);
+    return () => mq.removeEventListener("change", follow);
+  }, []);
+
   const toggle = () => {
     const next = currentTheme() === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
     try {
-      localStorage.setItem("patgpt-theme", next);
+      // Picking the same as the device goes back to following the device.
+      if (next === deviceTheme()) localStorage.removeItem(KEY);
+      else localStorage.setItem(KEY, next);
     } catch {}
   };
 
