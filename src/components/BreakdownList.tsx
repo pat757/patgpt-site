@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { CATEGORIES } from "@/lib/site";
+import { withoutImages } from "@/lib/body";
 import { breakdownHref, catOf, fmtDate, isPdf, readMins } from "@/lib/format";
 import { deleteBreakdown } from "@/lib/admin-actions";
 import type { Breakdown } from "@/lib/types";
@@ -32,7 +33,7 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
     return posts.filter(
       (p) =>
         (cat === "All" || catOf(p) === cat) &&
-        (!q || [p.title, p.description, p.body, p.tags.join(" "), p.category].join(" ").toLowerCase().includes(q)),
+        (!q || [p.title, p.description, withoutImages(p.body), p.tags.join(" "), p.category].join(" ").toLowerCase().includes(q)),
     );
   }, [posts, cat, query]);
 
@@ -112,6 +113,11 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
                     {pdfs ? ` · ${pdfs} ${pdfs === 1 ? "PDF" : "PDFs"}` : ""}
                   </span>
                   <span style={{ display: "flex", gap: 18, alignItems: "center" }}>
+                    {isAdmin && (
+                      <Link className="edit" href={`/breakdowns/${p.slug}/edit`}>
+                        Edit
+                      </Link>
+                    )}
                     {isAdmin && (
                       <ConfirmButton
                         label="Delete"

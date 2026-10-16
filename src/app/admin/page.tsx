@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { InboxTable } from "@/components/InboxTable";
-import { NewBreakdownForm } from "@/components/NewBreakdownForm";
+import { BreakdownForm } from "@/components/BreakdownForm";
 import { listInquiries } from "@/lib/data";
 import { getSession } from "@/lib/supabase/server";
 
@@ -26,7 +26,7 @@ export default async function AdminPage() {
             <button type="submit">Sign out</button>
           </form>
         </div>
-        <NewBreakdownForm />
+        <BreakdownForm />
         <InboxTable items={inquiries} />
       </div>
     </section>

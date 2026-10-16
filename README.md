@@ -2,8 +2,8 @@
 
 Pat's AI hub: prompt and tool breakdowns (with copyable prompt boxes and PDF previews), an About page, and a Work with me page for promotion, consulting and general inquiries. Built with **Next.js 16**, **Supabase** (database, file storage, admin sign-in) and hosted on **Vercel**.
 
-- **Visitors** read breakdowns, copy prompts, view and download PDFs, and send inquiries.
-- **You** (signed in as `pat@patgpt-ai.com`) publish and delete breakdowns, attach or remove PDFs, and read your inquiry inbox at **/admin**.
+- **Visitors** read breakdowns, copy prompts, see screenshots and photos (tap to enlarge), view and download PDFs, and send inquiries.
+- **You** (signed in as `pat@patgpt-ai.com`) publish, edit and delete breakdowns, add images anywhere in a post, attach or remove PDFs, and read your inquiry inbox at **/admin**.
 - Nobody else can sign in or change anything. The database rules in `supabase/schema.sql` enforce this, not just the page buttons.
 
 ---
@@ -74,7 +74,7 @@ Your domain was bought through Google, so it's now registered with **Squarespace
 
 1. Go to **https://patgpt-ai.com/admin**, enter `pat@patgpt-ai.com` and click **Email me a sign-in link**.
 2. Open the email and click **Sign in**. You land on your dashboard and stay signed in on that device.
-3. You'll now see an **Admin** link in the menu, **Delete** buttons on posts, and on each post an **Attach PDF** box and a **Delete post** button. Visitors never see these.
+3. You'll now see an **Admin** link in the menu, **Edit** and **Delete** buttons on posts, and on each post **Edit post**, **Attach PDF** and **Delete post** buttons. Visitors never see these.
 
 > Supabase's built-in email sends at most **2 emails an hour**, and only to members of your Supabase team. That's fine for signing yourself in. If you ever need more, connect your own email service under **Authentication → Emails → SMTP Settings**.
 
@@ -85,7 +85,9 @@ Your domain was bought through Google, so it's now registered with **Squarespace
 - **New breakdown:** go to `/admin` → **Add a breakdown**.
   - **Prompt boxes:** click **+ Insert prompt box** to add a prompt with a Copy button. To label a box, put the label right after the opening backticks, e.g. ` ```Follow-up `.
   - **Headings:** start a line with `##`.
+  - **Screenshots and photos:** paste a screenshot straight into the post (Ctrl/⌘+V), drag an image onto it, or click **+ Insert image**. It goes where your cursor is, as a line like `![](…)`. Type a caption between the `[ ]`, or delete the line to remove the image. Click **Preview** to see the post as readers will. Big photos are shrunk automatically and their hidden location data is removed. Up to 30 images per post.
   - **Files:** drag in PDFs or other files (up to 6 per post, 20 MB each). PDFs show inside the post with a page viewer.
+- **Change a published post:** open it and click **Edit post** (or **Edit** in the list on the home page). You can change the title, summary, text and images. Images you take out are deleted when you save.
 - **Add a PDF to an existing post:** open the post and use **+ Attach PDF**.
 - **Inquiries:** they appear in the inbox at `/admin`, labelled Promotion, Consulting or General. Reply by clicking the sender's email.
 - **Links you can share:**
@@ -110,7 +112,7 @@ npm run dev                  # http://localhost:3000
 | Path | What it is |
 | --- | --- |
 | `src/app/page.tsx` | Home: breakdowns list and the scroll animation |
-| `src/app/breakdowns/[slug]` | A single breakdown with prompt boxes and PDF viewer |
+| `src/app/breakdowns/[slug]` | A single breakdown with prompt boxes, images and PDF viewer (`/edit` is the admin edit page) |
 | `src/app/about`, `src/app/work-with-me` | About and contact pages |
 | `src/app/admin` | Your dashboard and sign-in page |
 | `src/app/auth` | Sign-in link handler and sign-out |

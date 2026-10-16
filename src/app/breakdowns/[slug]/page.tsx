@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { PostBody } from "@/components/PostBody";
 import { PostFiles } from "@/components/PostFiles";
 import { getBreakdown } from "@/lib/data";
-import { catOf, fmtDate, isPdf, readMins } from "@/lib/format";
+import { parseBody } from "@/lib/body";
+import { catOf, fmtDate, isImage, isPdf, readMins } from "@/lib/format";
+import { imageUrl } from "@/lib/storage";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -13,11 +15,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { post } = await getBreakdown(slug);
   if (!post) return { title: "Breakdown not found" };
   const description = post.description || `A ${catOf(post)} breakdown from PatGPT.`;
+  // The first picture in the post becomes the preview image when the link is shared.
+  const firstInText = parseBody(post.body).find((b) => b.kind === "img");
+  const firstAttached = post.files.find((f) => !isPdf(f) && isImage(f));
+  const cover = firstInText?.kind === "img" ? imageUrl(firstInText.src) : firstAttached ? imageUrl(firstAttached.path) : null;
   return {
     title: post.title,
     description,
     alternates: { canonical: `/breakdowns/${post.slug}` },
-    openGraph: { type: "article", title: post.title, description, url: `/breakdowns/${post.slug}`, publishedTime: post.created_at },
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description,
+      url: `/breakdowns/${post.slug}`,
+      publishedTime: post.created_at,
+      ...(cover ? { images: [cover] } : {}),
+    },
+    ...(cover ? { twitter: { card: "summary_large_image", title: post.title, description, images: [cover] } } : {}),
   };
 }
 

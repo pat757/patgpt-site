@@ -1,5 +1,6 @@
 import { parseBody } from "@/lib/body";
 import { CopyButton } from "./CopyButton";
+import { PostImage } from "./PostImage";
 
 export function PostBody({ text }: { text: string }) {
   const blocks = parseBody(text);
@@ -8,6 +9,7 @@ export function PostBody({ text }: { text: string }) {
       {blocks.map((b, i) => {
         if (b.kind === "h") return <h2 key={i}>{b.text}</h2>;
         if (b.kind === "p") return <p key={i}>{b.text}</p>;
+        if (b.kind === "img") return <PostImage key={i} src={b.src} caption={b.caption} />;
         return (
           <div className="pbox" key={i}>
             <div className="pbox-h">

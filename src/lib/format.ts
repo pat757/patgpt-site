@@ -1,3 +1,4 @@
+import { withoutImages } from "./body";
 import { CATEGORIES } from "./site";
 import type { Breakdown, StoredFile } from "./types";
 
@@ -24,11 +25,14 @@ export const extOf = (name: string | null | undefined) => {
 
 export const isPdf = (f: Pick<StoredFile, "name" | "type">) => f.type === "application/pdf" || extOf(f.name) === "pdf";
 
+export const isImage = (f: Pick<StoredFile, "name" | "type">) =>
+  /^image\/(png|jpeg|gif|webp)$/.test(f.type) || ["png", "jpg", "jpeg", "gif", "webp"].includes(extOf(f.name));
+
 export const catOf = (b: Pick<Breakdown, "category">) =>
   (CATEGORIES as readonly string[]).includes(b.category) ? b.category : "Other";
 
 export const readMins = (b: Pick<Breakdown, "body" | "description">) =>
-  Math.max(1, Math.round(`${b.body || ""} ${b.description || ""}`.split(/\s+/).filter(Boolean).length / 220));
+  Math.max(1, Math.round(`${withoutImages(b.body)} ${b.description || ""}`.split(/\s+/).filter(Boolean).length / 220));
 
 export const safeUrl = (u: string | null | undefined) => (u && /^https?:\/\//i.test(u) ? u : "");
 

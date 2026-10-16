@@ -314,3 +314,36 @@ nav a.admin-link{color:var(--accent-text); font-weight:600}
 .portrait-wrap{position:relative}
 .pdfv-stack{display:flex; flex-direction:column; align-items:center; gap:14px; width:100%}
 .pdfv-stack:empty{display:none}
+
+/* images in posts */
+.pimg{margin:1.6em 0 1.8em}
+.pimg-btn{display:inline-block; max-width:100%; padding:0; margin:0; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--surface); cursor:zoom-in; vertical-align:top; line-height:0}
+.pimg-btn:hover{border-color:var(--accent)}
+.pimg-btn img{display:block; max-width:100%; max-height:80vh; width:auto; height:auto}
+.pimg-btn.sized{display:block}
+.pimg-btn.sized img{width:100%; max-height:none}
+.pimg figcaption{margin-top:10px; color:var(--muted); font-size:.9rem; line-height:1.5}
+.pimg .unattach{display:block; margin-top:6px}
+.attached-images .pimg:first-child{margin-top:0}
+.zoom{padding:0; margin:0; border:none; background:transparent; width:100vw; height:100dvh; max-width:none; max-height:none; overflow:hidden; cursor:zoom-out}
+.zoom[open]{display:grid; place-items:center}
+.zoom::backdrop{background:rgba(12,7,4,.9)}
+.zoom img{max-width:94vw; max-height:88dvh; width:auto; height:auto; border-radius:8px; box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.zoom-x{position:fixed; top:14px; right:16px; width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.25); background:rgba(0,0,0,.45); color:#fff; font-size:1.6rem; line-height:1; cursor:pointer}
+
+/* post editor */
+.ins-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+.ins-row .ins{margin-bottom:0}
+.ins[disabled]{opacity:.5; cursor:default}
+.ins-preview{margin-left:auto}
+.ins-preview[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
+.hint{color:var(--muted); font-size:.84rem; margin-top:8px}
+.preview{border:1px solid var(--line); border-radius:10px; padding:18px 20px 6px; background:var(--field); min-height:300px}
+.preview .body{max-width:68ch}
+.preview .body p{margin:0 0 1.1em}
+.preview .body h2{font-size:1.4rem; margin:1.2em 0 .6em}
+.preview .body > :first-child{margin-top:0}
+.form-actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.ownerbar-act{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.post .foot .edit{color:var(--accent-text); font-size:.85rem; text-decoration:none}
+.post .foot .edit:hover{text-decoration:underline}
