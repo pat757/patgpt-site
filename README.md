@@ -1,4 +1,4 @@
-# PatGPT — patgpt-ai.com
+# Pat Automates — patgpt-ai.com
 
 Pat's AI hub: prompt and tool breakdowns (with copyable prompt boxes and PDF previews), an About page, and a Work with me page for promotion, consulting and general inquiries. Built with **Next.js 16**, **Supabase** (database, file storage, admin sign-in) and hosted on **Vercel**.
 
@@ -27,7 +27,7 @@ You should already have a Supabase project called `patgpt`, created while signed
 6. **Make sign-in links work on any device (recommended).** Go to **Authentication → Emails → Magic Link** (it may be under Email Templates). Replace the link in the template with:
 
    ```html
-   <h2>Sign in to PatGPT</h2>
+   <h2>Sign in to Pat Automates</h2>
    <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/admin">Sign in</a></p>
    ```
 

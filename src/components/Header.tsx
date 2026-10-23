@@ -55,7 +55,7 @@ export function Header({ isAdmin }: { isAdmin: boolean }) {
     <header>
       <div className="wrap">
         <Link className="logo" href="/">
-          Pat<span className="brand-gpt">GPT</span>
+          Pat <span className="brand-accent">Automates</span>
         </Link>
         <nav aria-label="Main">
           <Link className="home" href="/" {...cur("/")}>

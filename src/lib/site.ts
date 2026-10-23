@@ -2,7 +2,7 @@
 // change it in supabase/schema.sql (the is_admin() function) too.
 
 export const SITE = {
-  name: "PatGPT",
+  name: "Pat Automates",
   url: "https://patgpt-ai.com",
   domain: "patgpt-ai.com",
   email: "pat@patgpt-ai.com",

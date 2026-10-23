@@ -1,4 +1,4 @@
--- PatGPT site: database, file storage and security rules.
+-- Pat Automates site: database, file storage and security rules.
 -- Run this once in Supabase: Dashboard > SQL Editor > New query > paste > Run.
 -- It's safe to run again (it updates rather than duplicates).
 

@@ -6,7 +6,7 @@ export function Footer() {
     <footer>
       <div className="wrap" style={{ maxWidth: 880 }}>
         <Link className="logo" href="/">
-          Pat<span className="brand-gpt">GPT</span>
+          Pat <span className="brand-accent">Automates</span>
         </Link>
         <div className="foot-links">
           <a href={`mailto:${SITE.email}`}>{SITE.email}</a>

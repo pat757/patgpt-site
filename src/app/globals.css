@@ -29,12 +29,12 @@ h1,h2,h3{font-family:var(--display); letter-spacing:-0.02em; margin:0; font-weig
 p{margin:0}
 .eyebrow{color:var(--accent-text); font-size:.95rem; font-weight:500; margin-bottom:14px}
 .muted{color:var(--muted)}
-.brand-gpt{color:var(--accent-text)}
+.brand-accent{color:var(--accent-text)}
 
 /* nav */
 header{position:sticky; top:0; z-index:20; background:color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
 header .wrap{display:flex; align-items:center; justify-content:space-between; height:68px; gap:12px}
-.logo{font-family:var(--display); font-weight:700; font-size:1.2rem; text-decoration:none; letter-spacing:-0.02em}
+.logo{font-family:var(--display); font-weight:700; font-size:1.2rem; text-decoration:none; letter-spacing:-0.02em; white-space:nowrap}
 nav{display:flex; align-items:center; gap:4px}
 nav a{text-decoration:none; color:var(--muted); font-size:.95rem; padding:8px 10px; border-radius:8px}
 nav a:hover{color:var(--ink)}
@@ -47,14 +47,15 @@ nav a.cta:hover,nav a.cta[aria-current="page"]{border-color:var(--line); backgro
 .theme .moon{display:block} .theme .sun{display:none}
 :root[data-theme="dark"] .theme .moon{display:none}
 :root[data-theme="dark"] .theme .sun{display:block}
-@media (max-width:520px){ nav a.home{display:none} nav a{padding:8px 7px} }
+@media (max-width:520px){ nav a.home{display:none} nav a{padding:8px 6px; font-size:.9rem; white-space:nowrap} header .wrap{gap:8px} .logo{font-size:1.05rem} .theme{margin-left:2px} }
+@media (max-width:370px){ header .wrap{padding:0 16px} nav a{padding:8px 5px; font-size:.86rem} .logo{font-size:1rem} }
 
 main{flex:1}
 .view{padding:88px 0 96px}
 @media (max-width:640px){ .view{padding:56px 0 72px} }
 
 /* home */
-.wordmark{font-size:clamp(3.6rem,11vw,6.2rem); font-weight:700; letter-spacing:-0.045em; line-height:1}
+.wordmark{font-size:clamp(2.5rem,10.5vw,6rem); font-weight:700; letter-spacing:-0.045em; line-height:1}
 .intro{margin-top:22px; font-size:1.12rem; color:var(--muted); max-width:52ch}
 .searchbox{position:relative; margin-top:44px}
 .searchbox svg{position:absolute; left:18px; top:50%; transform:translateY(-50%); width:20px; height:20px; color:var(--accent-text); pointer-events:none}

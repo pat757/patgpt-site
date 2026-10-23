@@ -4,7 +4,7 @@ import { isInquiryKind } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Work with me",
-  description: "Promotion and partnerships, AI consulting, or a general question. Get in touch with Pat from PatGPT.",
+  description: "Promotion and partnerships, AI consulting, or a general question. Get in touch with Pat from Pat Automates.",
   alternates: { canonical: "/work-with-me" },
 };
 

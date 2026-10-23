@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const { post } = await getBreakdown(slug);
   if (!post) return { title: "Breakdown not found" };
-  const description = post.description || `A ${catOf(post)} breakdown from PatGPT.`;
+  const description = post.description || `A ${catOf(post)} breakdown from Pat Automates.`;
   // The first picture in the post becomes the preview image when the link is shared.
   const firstAttached = post.files.find((f) => !isPdf(f) && isImage(f));
   const cover = firstImageIn(post.body) ?? (firstAttached ? imageUrl(firstAttached.path) : null);

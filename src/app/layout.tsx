@@ -10,18 +10,18 @@ import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
-  title: { default: "PatGPT AI Hub", template: "%s | PatGPT" },
+  title: { default: SITE.name, template: `%s | ${SITE.name}` },
   description: SITE.description,
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    siteName: "PatGPT",
+    siteName: SITE.name,
     url: SITE.url,
-    title: "PatGPT AI Hub",
+    title: SITE.name,
     description: SITE.description,
-    images: [{ url: "/pat.jpg", width: 800, height: 800, alt: "Pat from PatGPT" }],
+    images: [{ url: "/pat.jpg", width: 800, height: 800, alt: `Pat from ${SITE.name}` }],
   },
-  twitter: { card: "summary", title: "PatGPT AI Hub", description: SITE.description, images: ["/pat.jpg"] },
+  twitter: { card: "summary", title: SITE.name, description: SITE.description, images: ["/pat.jpg"] },
 };
 
 export const viewport: Viewport = {

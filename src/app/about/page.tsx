@@ -5,7 +5,7 @@ import pat from "../../../public/pat.jpg";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Why PatGPT exists: prompts that work, tools put through their paces, and no hype.",
+  description: "Why Pat Automates exists: prompts that work, tools put through their paces, and no hype.",
   alternates: { canonical: "/about" },
 };
 
@@ -17,10 +17,10 @@ export default function AboutPage() {
           <div className="prose">
             <p className="eyebrow">About</p>
             <h1 className="pageh" id="about-h">
-              Why PatGPT exists
+              Why Pat Automates exists
             </h1>
             <p>
-              I&apos;m Patrick Holmes, Pat for short. PatGPT is where I keep the stuff that actually works: prompts I use
+              I&apos;m Patrick Holmes, Pat for short. Pat Automates is where I keep the stuff that actually works: prompts I use
               every week, tools I&apos;ve put through their paces, and the odd opinion about where AI is genuinely useful
               versus where it&apos;s noise.
             </p>
@@ -36,7 +36,7 @@ export default function AboutPage() {
               is for.
             </p>
           </div>
-          <Image className="portrait" src={pat} alt="Patrick Holmes, creator of PatGPT" priority sizes="(max-width: 820px) 300px, 400px" />
+          <Image className="portrait" src={pat} alt="Patrick Holmes, creator of Pat Automates" priority sizes="(max-width: 820px) 300px, 400px" />
         </div>
         <h2 className="about-sub">What you&apos;ll find here</h2>
         <div className="cards">

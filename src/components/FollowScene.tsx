@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import { SITE } from "@/lib/site";
 
-const TEXT = "Follow PatGPT for more AI hacks!";
+const TEXT = `Follow ${SITE.name} for more AI hacks!`;
 
 /** Scroll-driven scene: the prompt types out, the camera follows, then pulls back to the full bar. */
 export function FollowScene() {
@@ -73,6 +73,13 @@ export function FollowScene() {
     const size = () => {
       W = Math.min(640, stageEl.clientWidth - 40);
       barEl.style.width = W + "px";
+      // Shrink the bar's text on narrow screens so the whole line fits.
+      barEl.style.fontSize = "";
+      typedEl.textContent = TEXT;
+      restEl.textContent = "";
+      const needed = typedEl.offsetWidth + 6;
+      const room = txtEl.clientWidth;
+      if (needed > room) barEl.style.fontSize = Math.max(10, Math.floor((15 * room * 10) / needed) / 10) + "px";
       lastN = -1;
       frame();
     };
@@ -93,7 +100,7 @@ export function FollowScene() {
   }, []);
 
   return (
-    <section className="fs" ref={sec} aria-label="Follow PatGPT for more AI hacks">
+    <section className="fs" ref={sec} aria-label={`Follow ${SITE.name} for more AI hacks`}>
       <div className="fs-stage" ref={stage}>
         <div className="fs-cam" ref={cam} aria-hidden="true">
           <div className="fs-bar" ref={bar}>
