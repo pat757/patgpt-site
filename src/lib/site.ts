@@ -3,8 +3,8 @@
 
 export const SITE = {
   name: "Pat Automates",
-  url: "https://patgpt-ai.com",
-  domain: "patgpt-ai.com",
+  url: "https://patautomates.com",
+  domain: "patautomates.com",
   email: "pat@patgpt-ai.com",
   adminEmail: "pat@patgpt-ai.com",
   owner: "Patrick Holmes",

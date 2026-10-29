@@ -1,4 +1,4 @@
-# Pat Automates — patgpt-ai.com
+# Pat Automates — patautomates.com
 
 Pat's AI hub: prompt and tool breakdowns (with copyable prompt boxes and PDF previews), an About page, and a Work with me page for promotion, consulting and general inquiries. Built with **Next.js 16**, **Supabase** (database, file storage, admin sign-in) and hosted on **Vercel**.
 
@@ -22,8 +22,8 @@ You should already have a Supabase project called `patgpt`, created while signed
    3. Tick **Auto Confirm User**, then create the user.
 4. **Stop strangers signing up.** Go to **Authentication → Sign In / Providers** and turn **off** "Allow new users to sign up".
 5. **Tell Supabase your web address.** Go to **Authentication → URL Configuration**.
-   - **Site URL:** `https://patgpt-ai.com`
-   - **Redirect URLs:** add `https://patgpt-ai.com/**`, `https://*.vercel.app/**` and `http://localhost:3000/**`.
+   - **Site URL:** `https://patautomates.com`
+   - **Redirect URLs:** add `https://patautomates.com/**`, `https://www.patautomates.com/**`, `https://patgpt-ai.com/**`, `https://*.vercel.app/**` and `http://localhost:3000/**`.
 6. **Make sign-in links work on any device (recommended).** Go to **Authentication → Emails → Magic Link** (it may be under Email Templates). Replace the link in the template with:
 
    ```html
@@ -50,29 +50,27 @@ You should already have a Supabase project called `patgpt`, created while signed
 
 3. Click **Deploy**. After a minute or two you'll get a `something.vercel.app` link. Open it and check that your headshot breakdown appears.
 
-### 3. Point patgpt-ai.com at Vercel
+### 3. Point patautomates.com at Vercel
 
-Your domain was bought through Google, so it's now registered with **Squarespace Domains**, and Squarespace holds its DNS. Your Google Workspace email (pat@patgpt-ai.com) also depends on that DNS, so only change the records listed here.
+Both domains were bought through Google, so they're registered with **Squarespace Domains**, and Squarespace holds their DNS. The site lives on **patautomates.com**. **patgpt-ai.com** stays connected only so old links redirect to the new domain, and because your email (pat@patgpt-ai.com) runs on it, so don't change its records.
 
-1. **In Vercel:** open the project and go to **Settings → Domains → Add Domain**. Enter `patgpt-ai.com` and accept the suggestion to add `www.patgpt-ai.com` too. Vercel then shows the two records you need:
-   - an **A** record for `@` (often `76.76.21.21`, but newer projects may get a different address such as `216.198.79.1`)
+1. **In Vercel:** open the project and go to **Settings → Domains → Add Domain**. Enter `patautomates.com` and accept the suggestion to add `www.patautomates.com` too. Vercel then shows the two records you need:
+   - an **A** record for `@` (for this project it has been `216.198.79.1`)
    - a **CNAME** record for `www` (a value like `xxxxxxxx.vercel-dns-017.com`)
 
    **Use exactly what Vercel shows you.**
-2. **In Squarespace:**
-   1. Sign in to Squarespace with the Google account you used for Workspace. You can also get there from the Google Admin console: **Account → Domains → Manage domains**.
-   2. Open **Domains**, select `patgpt-ai.com`, then **DNS → DNS Settings**.
-   3. Under **Squarespace Defaults**, delete only the **A** records for `@` and the **CNAME** for `www`. These point at a Squarespace parking page and would clash with Vercel.
-   4. Under **Custom Records**, add:
+2. **In Squarespace:** open **Domains**, select `patautomates.com`, then **DNS → DNS Settings**.
+   1. Delete the **Squarespace Defaults** preset (it points the domain at a parking page). It's fine to delete the whole preset on this domain, because no email runs on it.
+   2. Under **Custom Records**, add:
       - Type **A**, Host `@`, Data = the A value from Vercel
       - Type **CNAME**, Host `www`, Data = the CNAME value from Vercel
-3. **Do not touch** any **MX** records, **TXT** records (SPF, DKIM, `google-site-verification`) or the **Google Workspace** preset. Those run your email.
+3. **Leave patgpt-ai.com exactly as it is**, in Squarespace and in Vercel. Its records keep your email and the redirect working.
 4. Wait. It usually takes a few minutes, but can take up to a few hours. Vercel shows **Valid Configuration** when it's done and sets up HTTPS automatically.
-5. Visit **https://patgpt-ai.com**, then send yourself a test email to make sure pat@patgpt-ai.com still receives mail.
+5. In Supabase, go to **Authentication → URL Configuration**, set **Site URL** to `https://patautomates.com` and add the new **Redirect URLs** listed in step 1 above. This makes sign-in links come back to the new domain.
 
 ### 4. Sign in and post
 
-1. Go to **https://patgpt-ai.com/admin**, enter `pat@patgpt-ai.com` and click **Email me a sign-in link**.
+1. Go to **https://patautomates.com/admin**, enter `pat@patgpt-ai.com` and click **Email me a sign-in link**.
 2. Open the email and click **Sign in**. You land on your dashboard and stay signed in on that device.
 3. You'll now see an **Admin** link in the menu, **Edit** and **Delete** buttons on posts, and on each post **Edit post**, **Attach PDF** and **Delete post** buttons. Visitors never see these.
 
@@ -91,8 +89,8 @@ Your domain was bought through Google, so it's now registered with **Squarespace
 - **Add a PDF to an existing post:** open the post and use **+ Attach PDF**.
 - **Inquiries:** they appear in the inbox at `/admin`, labelled Promotion, Consulting or General. Reply by clicking the sender's email.
 - **Links you can share:**
-  - `https://patgpt-ai.com/work-with-me?type=promotion` opens the form with Promotion selected (`?type=consulting` and `?type=general` work too).
-  - `https://patgpt-ai.com/contact` redirects to Work with me.
+  - `https://patautomates.com/work-with-me?type=promotion` opens the form with Promotion selected (`?type=consulting` and `?type=general` work too).
+  - `https://patautomates.com/contact` redirects to Work with me.
 - **Edit text, links or socials:** most site-wide details (email, social links, inquiry options, budget ranges) live in [`src/lib/site.ts`](src/lib/site.ts). Commit a change on GitHub and Vercel redeploys automatically.
 
 ## Changing the admin email
