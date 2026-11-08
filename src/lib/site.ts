@@ -11,9 +11,8 @@ export const SITE = {
   description:
     "Prompts, tools and AI breakdowns from Pat, plus promotion, partnerships and AI consulting.",
   socials: [
-    { label: "Instagram", href: "https://www.instagram.com/patgpt.ai/" },
-    { label: "TikTok", href: "https://www.tiktok.com/@patgpt.ai" },
-    { label: "YouTube", href: "https://www.youtube.com/@PatGPTAI" },
+    { label: "Instagram", href: "https://www.instagram.com/patautomates/" },
+    { label: "TikTok", href: "https://www.tiktok.com/@patautomates" },
   ],
 } as const;
 
@@ -31,7 +30,7 @@ export const INQUIRY_KINDS = {
     blurb: "Get your AI tool or product in front of an audience that uses AI every day.",
     points: [
       "Sponsored breakdowns on this site",
-      "Short videos on Instagram, TikTok and YouTube",
+      "Short videos on Instagram and TikTok",
       "Honest tool tests and reviews",
       "I only promote tools I'd actually use",
     ],
