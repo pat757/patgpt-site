@@ -13,7 +13,7 @@ language sql
 stable
 set search_path = ''
 as $$
-  select coalesce(lower(auth.jwt() ->> 'email'), '') = 'pat@patgpt-ai.com'
+  select coalesce(lower(auth.jwt() ->> 'email'), '') = 'pat@patautomates.com'
 $$;
 
 grant execute on function public.is_admin() to anon, authenticated;

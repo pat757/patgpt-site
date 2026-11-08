@@ -1,5 +1,5 @@
 "use server";
-import { BUDGETS, isInquiryKind } from "@/lib/site";
+import { BUDGETS, SITE, isInquiryKind } from "@/lib/site";
 import { createClient } from "@/lib/supabase/server";
 import { isConfigured } from "@/lib/supabase/env";
 
@@ -23,7 +23,7 @@ export async function sendInquiry(_prev: InquiryState, form: FormData): Promise<
   if (!name || !email || !message) return { ok: false, message: "Fill in your name, email and message." };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, message: "That email address doesn't look right." };
   if (type === "promotion" && !business) return { ok: false, message: "Add your brand or company name." };
-  if (!isConfigured()) return { ok: false, message: "The form isn't connected yet. Email pat@patgpt-ai.com instead." };
+  if (!isConfigured()) return { ok: false, message: `The form isn't connected yet. Email ${SITE.email} instead.` };
 
   const supabase = await createClient();
   const { error } = await supabase.from("inquiries").insert({
@@ -35,6 +35,6 @@ export async function sendInquiry(_prev: InquiryState, form: FormData): Promise<
     budget: type === "promotion" ? ((BUDGETS as readonly string[]).includes(budgetRaw) ? budgetRaw : "Not sure yet") : null,
     message,
   });
-  if (error) return { ok: false, message: "Couldn't send it. Email pat@patgpt-ai.com instead." };
+  if (error) return { ok: false, message: `Couldn't send it. Email ${SITE.email} instead.` };
   return { ok: true, message: "Inquiry sent. I'll reply within two working days." };
 }

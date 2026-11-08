@@ -3,7 +3,7 @@
 Pat's AI hub: prompt and tool breakdowns (with copyable prompt boxes and PDF previews), an About page, and a Work with me page for promotion, consulting and general inquiries. Built with **Next.js 16**, **Supabase** (database, file storage, admin sign-in) and hosted on **Vercel**.
 
 - **Visitors** read breakdowns, copy prompts, see screenshots and photos (tap to enlarge), view and download PDFs, and send inquiries. The site follows each visitor's light/dark device setting, and the moon/sun button lets them switch.
-- **You** (signed in as `pat@patgpt-ai.com`) publish, edit and delete breakdowns, add images anywhere in a post, attach or remove PDFs, and read your inquiry inbox at **/admin**.
+- **You** (signed in as `pat@patautomates.com`) publish, edit and delete breakdowns, add images anywhere in a post, attach or remove PDFs, and read your inquiry inbox at **/admin**.
 - Nobody else can sign in or change anything. The database rules in `supabase/schema.sql` enforce this, not just the page buttons.
 
 ---
@@ -12,18 +12,18 @@ Pat's AI hub: prompt and tool breakdowns (with copyable prompt boxes and PDF pre
 
 ### 1. Supabase
 
-You should already have a Supabase project called `patgpt`, created while signed in as **pat@patgpt-ai.com**.
+The Supabase project lives in the **patautomates** Supabase account.
 
 1. **Create the database.** In Supabase, open **SQL Editor → New query**. Paste the contents of [`supabase/schema.sql`](supabase/schema.sql) and click **Run**. You should see "Success. No rows returned."
 2. **Bring over your existing post.** Make another new query, paste [`supabase/seed.sql`](supabase/seed.sql) and click **Run**. This adds the ChatGPT headshot breakdown.
 3. **Create your admin login.**
    1. Go to **Authentication → Users → Add user → Create new user**.
-   2. Enter `pat@patgpt-ai.com` and any password. You won't use the password, because you sign in with email links.
+   2. Enter `pat@patautomates.com` and any password. You won't use the password, because you sign in with email links.
    3. Tick **Auto Confirm User**, then create the user.
 4. **Stop strangers signing up.** Go to **Authentication → Sign In / Providers** and turn **off** "Allow new users to sign up".
 5. **Tell Supabase your web address.** Go to **Authentication → URL Configuration**.
    - **Site URL:** `https://patautomates.com`
-   - **Redirect URLs:** add `https://patautomates.com/**`, `https://www.patautomates.com/**`, `https://patgpt-ai.com/**`, `https://*.vercel.app/**` and `http://localhost:3000/**`.
+   - **Redirect URLs:** add `https://patautomates.com/**`, `https://www.patautomates.com/**`, `https://*.vercel.app/**` and `http://localhost:3000/**`.
 6. **Make sign-in links work on any device (recommended).** Go to **Authentication → Emails → Magic Link** (it may be under Email Templates). Replace the link in the template with:
 
    ```html
@@ -52,7 +52,7 @@ You should already have a Supabase project called `patgpt`, created while signed
 
 ### 3. Point patautomates.com at Vercel
 
-Both domains were bought through Google, so they're registered with **Squarespace Domains**, and Squarespace holds their DNS. The site lives on **patautomates.com**. **patgpt-ai.com** stays connected only so old links redirect to the new domain, and because your email (pat@patgpt-ai.com) runs on it, so don't change its records.
+patautomates.com is registered with **Squarespace Domains**, and Squarespace holds its DNS. Your Google Workspace email (pat@patautomates.com) also runs on that DNS, so only change the records listed here.
 
 1. **In Vercel:** open the project and go to **Settings → Domains → Add Domain**. Enter `patautomates.com` and accept the suggestion to add `www.patautomates.com` too. Vercel then shows the two records you need:
    - an **A** record for `@` (for this project it has been `216.198.79.1`)
@@ -60,17 +60,17 @@ Both domains were bought through Google, so they're registered with **Squarespac
 
    **Use exactly what Vercel shows you.**
 2. **In Squarespace:** open **Domains**, select `patautomates.com`, then **DNS → DNS Settings**.
-   1. Delete the **Squarespace Defaults** preset (it points the domain at a parking page). It's fine to delete the whole preset on this domain, because no email runs on it.
+   1. Delete the **Squarespace Defaults** preset (it points the domain at a parking page). It only holds the parking-page records; your email records are under **Custom records** and stay.
    2. Under **Custom Records**, add:
       - Type **A**, Host `@`, Data = the A value from Vercel
       - Type **CNAME**, Host `www`, Data = the CNAME value from Vercel
-3. **Leave patgpt-ai.com exactly as it is**, in Squarespace and in Vercel. Its records keep your email and the redirect working.
+3. **Do not touch** the **MX** record or the **TXT** records (SPF, `google._domainkey`). Those run your email.
 4. Wait. It usually takes a few minutes, but can take up to a few hours. Vercel shows **Valid Configuration** when it's done and sets up HTTPS automatically.
 5. In Supabase, go to **Authentication → URL Configuration**, set **Site URL** to `https://patautomates.com` and add the new **Redirect URLs** listed in step 1 above. This makes sign-in links come back to the new domain.
 
 ### 4. Sign in and post
 
-1. Go to **https://patautomates.com/admin**, enter `pat@patgpt-ai.com` and click **Email me a sign-in link**.
+1. Go to **https://patautomates.com/admin**, enter `pat@patautomates.com` and click **Email me a sign-in link**.
 2. Open the email and click **Sign in**. You land on your dashboard and stay signed in on that device.
 3. You'll now see an **Admin** link in the menu, **Edit** and **Delete** buttons on posts, and on each post **Edit post**, **Attach PDF** and **Delete post** buttons. Visitors never see these.
 
