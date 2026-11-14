@@ -24,6 +24,10 @@ function SmartLink({ href, className, children }: { href: string; className?: st
   );
 }
 
+/** A post belongs under a chip if that's its category or one of its tags. */
+const inCategory = (p: Breakdown, c: string) =>
+  catOf(p) === c || p.tags.some((t) => t.trim().toLowerCase() === c.toLowerCase());
+
 export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; isAdmin: boolean; error: string | null }) {
   const router = useRouter();
   const [cat, setCat] = useState<string>("All");
@@ -33,13 +37,13 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
     const q = query.trim().toLowerCase();
     return posts.filter(
       (p) =>
-        (cat === "All" || catOf(p) === cat) &&
+        (cat === "All" || inCategory(p, cat)) &&
         (!q || [p.title, p.description, plainText(p.body), p.tags.join(" "), p.category].join(" ").toLowerCase().includes(q)),
     );
   }, [posts, cat, query]);
 
   // Only offer categories that have posts, and skip the row entirely when there's nothing to choose between.
-  const used = CATEGORIES.filter((c) => posts.some((p) => catOf(p) === c));
+  const used = CATEGORIES.filter((c) => posts.some((p) => inCategory(p, c)));
   const showChips = used.length > 1;
   const reset = () => {
     setCat("All");
@@ -119,6 +123,15 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
               <article className="post" key={p.id}>
                 <div className="meta">
                   <span className="pill">{category}</span>
+                  {prompts > 0 && (
+                    <span className="has-prompt">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <rect x="9" y="9" width="12" height="12" rx="2.5" />
+                        <path d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5" />
+                      </svg>
+                      {prompts === 1 ? "Prompt to copy" : `${prompts} prompts to copy`}
+                    </span>
+                  )}
                   {tags.map((t) => (
                     <span key={t}>{t}</span>
                   ))}
@@ -130,14 +143,7 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
                     {fmtDate(p.created_at)}
                     {p.body ? ` · ${readMins(p)} min read` : ""}
                     {pdfs ? ` · ${pdfs} ${pdfs === 1 ? "PDF" : "PDFs"}` : ""}
-                    {prompts ? (
-                      <>
-                        {" · "}
-                        <span className="has-prompt">
-                          {prompts === 1 ? "Prompt to copy" : `${prompts} prompts to copy`}
-                        </span>
-                      </>
-                    ) : null}
+
                   </span>
                   <span className="foot-r">
                     {isAdmin && (

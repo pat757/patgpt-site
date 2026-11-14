@@ -165,6 +165,19 @@ export function firstImageIn(text: string | null | undefined): string | null {
   return img && img.kind === "img" ? imageUrl(img.src) : null;
 }
 
+/** The first copyable prompt in a post, if it has one. */
+export function firstPrompt(text: string | null | undefined): { label: string; text: string } | null {
+  if (isHtmlBody(text)) {
+    const m = String(text).match(/<pre\b([^>]*)>([\s\S]*?)<\/pre>/i);
+    if (!m) return null;
+    const label = decodeEntities(m[1].match(/data-label="([^"]*)"/i)?.[1] || "").trim();
+    const body = decodeEntities(m[2].replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]*>/g, "")).replace(/^\n+|\n+$/g, "");
+    return body ? { label, text: body } : null;
+  }
+  const b = parseBody(text).find((x) => x.kind === "prompt");
+  return b && b.kind === "prompt" && b.text ? { label: b.label, text: b.text } : null;
+}
+
 /** How many copyable prompt boxes a post has. */
 export function promptCount(text: string | null | undefined): number {
   if (isHtmlBody(text)) return (String(text).match(/<pre[\s>]/gi) || []).length;
