@@ -2,9 +2,7 @@
 import { useEffect, useRef } from "react";
 import { SITE } from "@/lib/site";
 
-// The full line on wider screens; a shorter one on phones so it stays readable when the camera pulls back.
-const LONG = `Follow ${SITE.name} for more AI hacks!`;
-const SHORT = "Follow Pat for more AI hacks!";
+const TEXT = `Follow ${SITE.name} for more AI hacks!`;
 
 /** Scroll-driven scene: the prompt types out, the camera follows, then pulls back to the full bar. The follow links stay visible and tappable throughout. */
 export function FollowScene() {
@@ -30,7 +28,6 @@ export function FollowScene() {
     const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
     const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
     let W = 640;
-    let TEXT = LONG;
     let lastN = -1;
     let ticking = false;
 
@@ -45,15 +42,12 @@ export function FollowScene() {
       ticking = false;
       let p = 1;
       if (!reduce) {
-        // Progress runs from when the stage is half-way up the screen to the end of its pinned stretch,
-        // so typing has begun before it pins and the bar never sits blank.
         const r = secEl.getBoundingClientRect();
         const top = parseFloat(getComputedStyle(stageEl).top) || 0;
-        const pin = r.top + scrollY - top;
+        const start = r.top + scrollY - top;
         const maxScroll = document.documentElement.scrollHeight - innerHeight;
-        const end = Math.min(pin + secEl.offsetHeight - stageEl.offsetHeight, maxScroll);
-        const start = Math.min(pin - innerHeight * 0.5, end - 1);
-        p = clamp((scrollY - start) / Math.max(1, end - start), 0, 1);
+        const total = Math.min(secEl.offsetHeight - stageEl.offsetHeight, maxScroll - start);
+        p = clamp((scrollY - start) / Math.max(1, total), 0, 1);
       }
       const tType = clamp((p - 0.04) / 0.56, 0, 1);
       const tZoom = ease(clamp((p - 0.62) / 0.34, 0, 1));
@@ -72,7 +66,6 @@ export function FollowScene() {
     };
     const size = () => {
       W = Math.min(640, stageEl.clientWidth - 40);
-      TEXT = stageEl.clientWidth < 520 ? SHORT : LONG;
       barEl.style.width = W + "px";
       // Shrink the bar's text on narrow screens so the whole line fits.
       barEl.style.fontSize = "";
@@ -80,8 +73,7 @@ export function FollowScene() {
       restEl.textContent = "";
       const needed = typedEl.offsetWidth + 6;
       const room = txtEl.clientWidth;
-      const base = parseFloat(getComputedStyle(barEl).fontSize) || 15;
-      if (needed > room) barEl.style.fontSize = Math.max(10, Math.floor((base * room * 10) / needed) / 10) + "px";
+      if (needed > room) barEl.style.fontSize = Math.max(10, Math.floor((15 * room * 10) / needed) / 10) + "px";
       lastN = -1;
       frame();
     };
@@ -114,11 +106,11 @@ export function FollowScene() {
               <span className="fs-typed" ref={typed} />
               <span className="fs-caret blink" ref={caret} />
               <span className="fs-rest" ref={rest}>
-                {LONG}
+                {TEXT}
               </span>
             </div>
             <div className="fs-meta">
-              <span>Auto</span>
+              <span>Flash</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m6 9 6 6 6-6" />
               </svg>
@@ -130,7 +122,7 @@ export function FollowScene() {
           </div>
         </div>
         <div className="fs-cta">
-          <h2 className="fs-h">New AI hacks every week.</h2>
+          <p>New AI hacks every week.</p>
           <div className="fs-links">
             {SITE.socials.map((s) => (
               <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer">
