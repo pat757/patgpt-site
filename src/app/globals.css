@@ -2,8 +2,8 @@
 :root{
   --bg:#FFFFFF; --bg-glow:#FFF3E8; --surface:#FFFAF5; --field:#FFFFFF; --ink:#24160D; --muted:#76604F; --line:#F0DFD0;
   --accent:#ED7436; --accent-ink:#24160D; --accent-text:#C0521A; --accent-soft:#FFEBDB; --danger:#C2362B;
-  --display:"Space Grotesk Variable", "Space Grotesk", "Avenir Next", "Segoe UI", system-ui, sans-serif;
-  --body:"DM Sans Variable", "DM Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --display:var(--font-display), "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body:var(--font-body), "Segoe UI", system-ui, -apple-system, sans-serif;
   color-scheme:light;
   box-sizing:border-box;
 }

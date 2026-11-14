@@ -1,12 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import "@fontsource-variable/space-grotesk";
-import "@fontsource-variable/dm-sans";
+import { Atkinson_Hyperlegible_Next, Schibsted_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { InlineScript } from "@/components/InlineScript";
 import { getSession } from "@/lib/supabase/server";
 import { SITE } from "@/lib/site";
+
+// Headings: Schibsted Grotesk, sturdy and plain-spoken. Body: Atkinson Hyperlegible Next, built for legibility on small screens.
+// next/font downloads them at build time and serves them from this site, with no request to Google from visitors.
+const display = Schibsted_Grotesk({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+const body = Atkinson_Hyperlegible_Next({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -41,7 +45,7 @@ const THEME_SCRIPT = `(function(){var t=null;try{t=localStorage.getItem("patgpt-
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isAdmin } = await getSession();
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${display.variable} ${body.variable}`} suppressHydrationWarning>
       <head>
         <InlineScript html={THEME_SCRIPT} />
       </head>
