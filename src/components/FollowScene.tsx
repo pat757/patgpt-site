@@ -4,7 +4,7 @@ import { SITE } from "@/lib/site";
 
 const TEXT = `Follow ${SITE.name} for more AI hacks!`;
 
-/** Scroll-driven scene: the prompt types out, the camera follows, then pulls back to the full bar. */
+/** Scroll-driven scene: the prompt types out, the camera follows, then pulls back to the full bar. The follow links stay visible and tappable throughout. */
 export function FollowScene() {
   const sec = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -15,14 +15,13 @@ export function FollowScene() {
   const rest = useRef<HTMLSpanElement>(null);
   const caret = useRef<HTMLSpanElement>(null);
   const hl = useRef<HTMLSpanElement>(null);
-  const cta = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const els = [sec, stage, cam, bar, txt, typed, rest, caret, hl, cta].map((r) => r.current);
+    const els = [sec, stage, cam, bar, txt, typed, rest, caret, hl].map((r) => r.current);
     if (els.some((e) => !e)) return;
-    const [secEl, stageEl, camEl, barEl, txtEl, typedEl, restEl, caretEl, hlEl, ctaEl] = els as [
+    const [secEl, stageEl, camEl, barEl, txtEl, typedEl, restEl, caretEl, hlEl] = els as [
       HTMLElement, HTMLDivElement, HTMLDivElement, HTMLDivElement, HTMLDivElement,
-      HTMLSpanElement, HTMLSpanElement, HTMLSpanElement, HTMLSpanElement, HTMLDivElement,
+      HTMLSpanElement, HTMLSpanElement, HTMLSpanElement, HTMLSpanElement,
     ];
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
@@ -50,9 +49,8 @@ export function FollowScene() {
         const total = Math.min(secEl.offsetHeight - stageEl.offsetHeight, maxScroll - start);
         p = clamp((scrollY - start) / Math.max(1, total), 0, 1);
       }
-      const tType = clamp((p - 0.06) / 0.54, 0, 1);
-      const tZoom = ease(clamp((p - 0.58) / 0.3, 0, 1));
-      const tCta = clamp((p - 0.86) / 0.1, 0, 1);
+      const tType = clamp((p - 0.04) / 0.56, 0, 1);
+      const tZoom = ease(clamp((p - 0.62) / 0.34, 0, 1));
 
       setChars(Math.round(TEXT.length * tType));
       caretEl.classList.toggle("blink", tType === 0 || tType === 1);
@@ -65,10 +63,6 @@ export function FollowScene() {
       const s = lerp(zoomIn, 1, tZoom);
       const focus = lerp(Math.max(caretX - 40, 24), W / 2, tZoom);
       camEl.style.transform = `scale(${s.toFixed(4)}) translate(${(-focus).toFixed(1)}px, -25px)`;
-
-      ctaEl.style.opacity = String(tCta);
-      ctaEl.style.transform = `translateY(${((1 - tCta) * 10).toFixed(1)}px)`;
-      ctaEl.classList.toggle("on", tCta > 0.5);
     };
     const size = () => {
       W = Math.min(640, stageEl.clientWidth - 40);
@@ -127,7 +121,7 @@ export function FollowScene() {
             </div>
           </div>
         </div>
-        <div className="fs-cta" ref={cta}>
+        <div className="fs-cta">
           <p>New AI hacks every week.</p>
           <div className="fs-links">
             {SITE.socials.map((s) => (

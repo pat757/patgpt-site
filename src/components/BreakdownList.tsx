@@ -3,10 +3,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { CATEGORIES } from "@/lib/site";
-import { plainText } from "@/lib/body";
+import { plainText, promptCount } from "@/lib/body";
 import { breakdownHref, catOf, fmtDate, isPdf, readMins } from "@/lib/format";
 import { deleteBreakdown } from "@/lib/admin-actions";
 import type { Breakdown } from "@/lib/types";
+import { Arrow } from "./Arrow";
 import { ConfirmButton } from "./ConfirmButton";
 
 function SmartLink({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) {
@@ -37,6 +38,14 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
     );
   }, [posts, cat, query]);
 
+  // Only offer categories that have posts, and skip the row entirely when there's nothing to choose between.
+  const used = CATEGORIES.filter((c) => posts.some((p) => catOf(p) === c));
+  const showChips = used.length > 1;
+  const reset = () => {
+    setCat("All");
+    setQuery("");
+  };
+
   return (
     <>
       <div className="searchbox">
@@ -52,13 +61,15 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
-      <div className="chips" role="group" aria-label="Filter by category">
-        {["All", ...CATEGORIES].map((c) => (
-          <button key={c} className="chip" type="button" aria-pressed={cat === c} onClick={() => setCat(c)}>
-            {c}
-          </button>
-        ))}
-      </div>
+      {showChips && (
+        <div className="chips" role="group" aria-label="Filter by category">
+          {["All", ...used].map((c) => (
+            <button key={c} className="chip" type="button" aria-pressed={cat === c} onClick={() => setCat(c)}>
+              {c}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="listhead">
         <h2>Latest breakdowns</h2>
@@ -69,14 +80,14 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
             </Link>
           )}
           <span>
-            {shown.length} {shown.length === 1 ? "article" : "articles"}
+            {shown.length} {shown.length === 1 ? "breakdown" : "breakdowns"}
           </span>
         </span>
       </div>
 
       <div aria-live="polite">
         {error === "not-configured" ? (
-          <p className="empty">The site isn&apos;t connected to its database yet. Follow the setup guide in the README.</p>
+          <p className="empty">Breakdowns aren&apos;t available right now. Check back soon.</p>
         ) : error ? (
           <p className="empty">Breakdowns couldn&apos;t load right now. Refresh to try again.</p>
         ) : !posts.length ? (
@@ -90,17 +101,25 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
             )}
           </p>
         ) : !shown.length ? (
-          <p className="empty">Nothing matches that. Try another search or pick All.</p>
+          <p className="empty">
+            Nothing matches that.{" "}
+            <button type="button" className="linkish" onClick={reset}>
+              Show all breakdowns
+            </button>
+          </p>
         ) : (
           shown.map((p) => {
             const href = breakdownHref(p);
             const pdfs = p.files.filter(isPdf).length;
             const action = p.body ? "Read" : pdfs ? "View PDF" : p.files.length ? "View" : "Open";
+            const prompts = promptCount(p.body);
+            const category = catOf(p);
+            const tags = p.tags.filter((t) => t.trim().toLowerCase() !== category.toLowerCase());
             return (
               <article className="post" key={p.id}>
                 <div className="meta">
-                  <span className="pill">{catOf(p)}</span>
-                  {p.tags.map((t) => (
+                  <span className="pill">{category}</span>
+                  {tags.map((t) => (
                     <span key={t}>{t}</span>
                   ))}
                 </div>
@@ -111,8 +130,16 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
                     {fmtDate(p.created_at)}
                     {p.body ? ` · ${readMins(p)} min read` : ""}
                     {pdfs ? ` · ${pdfs} ${pdfs === 1 ? "PDF" : "PDFs"}` : ""}
+                    {prompts ? (
+                      <>
+                        {" · "}
+                        <span className="has-prompt">
+                          {prompts === 1 ? "Prompt to copy" : `${prompts} prompts to copy`}
+                        </span>
+                      </>
+                    ) : null}
                   </span>
-                  <span style={{ display: "flex", gap: 18, alignItems: "center" }}>
+                  <span className="foot-r">
                     {isAdmin && (
                       <Link className="edit" href={`/breakdowns/${p.slug}/edit`}>
                         Edit
@@ -135,7 +162,7 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
                     )}
                     {href && (
                       <SmartLink href={href} className="read">
-                        {action} <span aria-hidden="true">→</span>
+                        {action} <Arrow />
                       </SmartLink>
                     )}
                   </span>

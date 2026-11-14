@@ -4,7 +4,7 @@ import { SITE } from "@/lib/site";
 export function Footer() {
   return (
     <footer>
-      <div className="wrap" style={{ maxWidth: 880 }}>
+      <div className="wrap">
         <Link className="logo" href="/">
           Pat <span className="brand-accent">Automates</span>
         </Link>

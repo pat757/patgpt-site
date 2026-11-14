@@ -65,7 +65,7 @@ export function Header({ isAdmin }: { isAdmin: boolean }) {
             About
           </Link>
           <Link className="cta" href="/work-with-me" {...cur("/work-with-me")}>
-            Work with me <span aria-hidden="true">↗</span>
+            Work with me
           </Link>
           {isAdmin && (
             <Link className="admin-link" href="/admin" {...cur("/admin")}>

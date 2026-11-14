@@ -165,6 +165,12 @@ export function firstImageIn(text: string | null | undefined): string | null {
   return img && img.kind === "img" ? imageUrl(img.src) : null;
 }
 
+/** How many copyable prompt boxes a post has. */
+export function promptCount(text: string | null | undefined): number {
+  if (isHtmlBody(text)) return (String(text).match(/<pre[\s>]/gi) || []).length;
+  return parseBody(text).filter((b) => b.kind === "prompt").length;
+}
+
 /** Just the words of a post (for read time and search). */
 export function plainText(text: string | null | undefined): string {
   if (!isHtmlBody(text)) return withoutImages(text);
