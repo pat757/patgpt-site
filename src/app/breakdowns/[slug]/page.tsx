@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
 import { PostBody } from "@/components/PostBody";
 import { PostFiles } from "@/components/PostFiles";
@@ -43,16 +44,21 @@ export default async function BreakdownPage({ params }: Props) {
   return (
     <section className="view">
       <div className="wrap article">
-        <Link className="back" href="/">
+        <Link className="back" href="/" prefetch>
           ← All breakdowns
         </Link>
         <div className="meta" style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", fontSize: ".85rem", color: "var(--muted)" }}>
-          <span className="pill">{catOf(post)}</span>
+          {/* Same names as the card on the homepage, so the pill and title morph across when a card is tapped. */}
+          <ViewTransition name={`bd-cat-${post.id}`} share="morph" default="none">
+            <span className="pill">{catOf(post)}</span>
+          </ViewTransition>
           {post.tags.map((t) => (
             <span key={t}>{t}</span>
           ))}
         </div>
-        <h1>{post.title}</h1>
+        <ViewTransition name={`bd-title-${post.id}`} share="morph" default="none">
+          <h1>{post.title}</h1>
+        </ViewTransition>
         {post.description && <p className="lead">{post.description}</p>}
         <p className="muted" style={{ marginTop: 14, fontSize: ".9rem" }}>
           {fmtDate(post.created_at)}

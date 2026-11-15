@@ -52,7 +52,8 @@ export function Header({ isAdmin }: { isAdmin: boolean }) {
   const cur = (href: string) => (at(href) ? ({ "aria-current": "page" } as const) : {});
 
   return (
-    <header>
+    // Named so it stays perfectly still while the page underneath changes (see view transitions in globals.css).
+    <header style={{ viewTransitionName: "site-header" }}>
       <div className="wrap">
         <Link className="logo" href="/">
           Pat <span className="brand-accent">Automates</span>

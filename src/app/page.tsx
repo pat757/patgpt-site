@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Arrow } from "@/components/Arrow";
 import { BreakdownList } from "@/components/BreakdownList";
 import { FollowScene } from "@/components/FollowScene";
+import { HeroInk } from "@/components/HeroInk";
 import { listBreakdowns } from "@/lib/data";
 import { INQUIRY_KINDS } from "@/lib/site";
 import pat from "../../public/pat.jpg";
@@ -24,12 +25,18 @@ export default async function Home() {
   const { posts, isAdmin, error } = await listBreakdowns();
   return (
     <section className="view" aria-labelledby="home-h">
-      <div className="wrap">
-        <div className="hello">
-          <Image className="avatar" src={pat} alt="Pat" priority sizes="88px" />
-          <h1 id="home-h">AI, made practical.</h1>
+      {/* Full-width band so the living ink can bleed edge to edge behind the hero. */}
+      <div className="hero-zone">
+        <HeroInk />
+        <div className="wrap">
+          <div className="hello">
+            <Image className="avatar" src={pat} alt="Pat" priority sizes="88px" />
+            <h1 id="home-h">AI, made practical.</h1>
+          </div>
+          <p className="intro">I&apos;m Pat. Here are the prompts, tools, and ideas that make AI worth your time.</p>
         </div>
-        <p className="intro">I&apos;m Pat. Here are the prompts, tools, and ideas that make AI worth your time.</p>
+      </div>
+      <div className="wrap">
         <BreakdownList posts={posts} isAdmin={isAdmin} error={error} />
 
         <section className="hire" aria-labelledby="hire-h">
