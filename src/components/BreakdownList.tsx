@@ -8,6 +8,7 @@ import { breakdownHref, catOf, fmtDate, isPdf, readMins } from "@/lib/format";
 import { deleteBreakdown } from "@/lib/admin-actions";
 import type { Breakdown } from "@/lib/types";
 import { Arrow } from "./Arrow";
+import { CaptionTitle } from "./CaptionTitle";
 import { ConfirmButton } from "./ConfirmButton";
 
 function SmartLink({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) {
@@ -197,7 +198,7 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
                   ))}
                 </div>
                 <ViewTransition name={`bd-title-${p.id}`} share="morph" default="none">
-                  <h3>{href ? <SmartLink href={href}>{p.title}</SmartLink> : p.title}</h3>
+                  <h3>{href ? <SmartLink href={href}><CaptionTitle title={p.title} category={category} /></SmartLink> : <CaptionTitle title={p.title} category={category} />}</h3>
                 </ViewTransition>
                 {p.description && <p className="ex">{p.description}</p>}
                 <div className="foot">

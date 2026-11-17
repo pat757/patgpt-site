@@ -3,14 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import pat from "../../public/pat.jpg";
+import { captionKeyword } from "@/lib/format";
 import { Arrow } from "./Arrow";
 
 export type Clip = { href: string; title: string; category: string; prompts: number };
 
 const DURATION = 5600; // ms each breakdown stays on screen
 const WORD_STEP = 110; // ms between caption words landing
-
-const clean = (w: string) => w.toLowerCase().replace(/[^a-z0-9]/g, "");
+const FIRST_DELAY = 950; // ms before the first caption, so it starts once the page headline has landed
 
 /**
  * The homepage reel: Pat's photo in a 9:16 frame playing the latest breakdowns as captions, word by word, with a
@@ -27,10 +27,11 @@ export function ReelHero({ clips }: { clips: Clip[] }) {
   const remaining = useRef(DURATION); // time left on the current clip
   const runningSince = useRef<number | null>(null);
   const fresh = useRef(true); // a new clip just started, so its full time is still to run
+  const firstCaption = useRef(true); // the first caption waits for the headline
 
   const clip = clips[index];
   const words = clip ? clip.title.split(/\s+/).filter(Boolean) : [];
-  const key = clip ? words.findIndex((w) => clean(w) === clean(clip.category)) : -1;
+  const key = clip ? captionKeyword(clip.title, clip.category) : -1;
   const paused = held || hover || still;
 
   useEffect(() => {
@@ -56,12 +57,20 @@ export function ReelHero({ clips }: { clips: Clip[] }) {
     }
     setShown(0);
     let n = 0;
-    const t = setInterval(() => {
-      n += 1;
-      setShown(n);
-      if (n >= words.length) clearInterval(t);
-    }, WORD_STEP);
-    return () => clearInterval(t);
+    let t: ReturnType<typeof setInterval> | undefined;
+    const delay = firstCaption.current ? FIRST_DELAY : 0;
+    firstCaption.current = false;
+    const start = setTimeout(() => {
+      t = setInterval(() => {
+        n += 1;
+        setShown(n);
+        if (n >= words.length && t) clearInterval(t);
+      }, WORD_STEP);
+    }, delay);
+    return () => {
+      clearTimeout(start);
+      if (t) clearInterval(t);
+    };
     // words is derived from clip; cycle restarts the reveal when the same clip replays
   }, [clip, still, cycle]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -96,7 +105,7 @@ export function ReelHero({ clips }: { clips: Clip[] }) {
       }}
       style={{ "--dur": `${DURATION}ms` } as CSSProperties}
     >
-      <Image className="reel-photo" src={pat} alt="" priority sizes="(max-width: 860px) 100vw, 420px" />
+      <Image key={`photo-${index}-${cycle}`} className="reel-photo push" src={pat} alt="" priority sizes="(max-width: 860px) 100vw, 420px" />
       {clips.length > 1 && (
         <div className="reel-bars" aria-hidden="true">
           {clips.map((c, n) => (

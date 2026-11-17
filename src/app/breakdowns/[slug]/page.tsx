@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
+import { CaptionTitle } from "@/components/CaptionTitle";
 import { PostBody } from "@/components/PostBody";
 import { PostFiles } from "@/components/PostFiles";
 import { getBreakdown } from "@/lib/data";
-import { firstImageIn } from "@/lib/body";
+import { firstImageIn, promptCount } from "@/lib/body";
 import { catOf, fmtDate, isImage, isPdf, readMins } from "@/lib/format";
 import { imageUrl } from "@/lib/storage";
 
@@ -40,6 +41,7 @@ export default async function BreakdownPage({ params }: Props) {
   const { post, isAdmin } = await getBreakdown(slug);
   if (!post) notFound();
   const pdfCount = post.files.filter(isPdf).length;
+  const prompts = promptCount(post.body);
 
   return (
     <section className="view">
@@ -60,13 +62,24 @@ export default async function BreakdownPage({ params }: Props) {
           ))}
         </div>
         <ViewTransition name={`bd-title-${post.id}`} share="morph" default="none">
-          <h1>{post.title}</h1>
+          <h1>
+            <CaptionTitle title={post.title} category={catOf(post)} />
+          </h1>
         </ViewTransition>
         {post.description && <p className="lead">{post.description}</p>}
         <p className="muted" style={{ marginTop: 14, fontSize: ".9rem" }}>
           {fmtDate(post.created_at)}
           {post.body ? ` · ${readMins(post)} min read` : ""}
           {pdfCount ? ` · ${pdfCount} ${pdfCount === 1 ? "PDF" : "PDFs"}` : ""}
+          {prompts > 0 && (
+            <>
+              {" · "}
+              {/* Followers come for the prompt; on a phone it can sit several screens down. */}
+              <a className="jump" href="#prompt-1">
+                {prompts === 1 ? "Jump to the prompt" : `Jump to the ${prompts} prompts`}
+              </a>
+            </>
+          )}
         </p>
         {post.body && <PostBody text={post.body} />}
         <PostFiles post={post} isAdmin={isAdmin} />
