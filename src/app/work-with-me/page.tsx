@@ -14,7 +14,7 @@ export default async function WorkWithMePage({ searchParams }: { searchParams: P
   const initialKind = isInquiryKind(t) ? t : "promotion";
   return (
     <section className="view" aria-labelledby="contact-h">
-      <div className="wrap" style={{ maxWidth: 880 }}>
+      <div className="wrap">
         {/* key resets the form when someone follows a link to a different type */}
         <ContactForm key={initialKind} initialKind={initialKind} />
       </div>

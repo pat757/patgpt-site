@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Atkinson_Hyperlegible_Next, Schibsted_Grotesk } from "next/font/google";
+import { Archivo, Atkinson_Hyperlegible_Next } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -7,9 +7,10 @@ import { InlineScript } from "@/components/InlineScript";
 import { getSession } from "@/lib/supabase/server";
 import { SITE } from "@/lib/site";
 
-// Headings: Schibsted Grotesk, sturdy and plain-spoken. Body: Atkinson Hyperlegible Next, built for legibility on small screens.
-// next/font downloads them at build time and serves them from this site, with no request to Google from visitors.
-const display = Schibsted_Grotesk({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+// Captions and headings: Archivo, heavy and a little wide, the way reel captions sit. Reading text: Atkinson
+// Hyperlegible Next, built for legibility on small screens. next/font downloads both at build time and serves
+// them from this site, with no request to Google from visitors.
+const display = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-display", display: "swap" });
 const body = Atkinson_Hyperlegible_Next({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 
 export const metadata: Metadata = {

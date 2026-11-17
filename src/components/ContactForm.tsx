@@ -30,9 +30,8 @@ export function ContactForm({ initialKind }: { initialKind: InquiryKind }) {
   return (
     <div className="split" style={{ marginTop: 0 }}>
       <div>
-        <p className="eyebrow">Work with me</p>
         <h1 className="pageh" id="contact-h">
-          Let&apos;s work together
+          Let&apos;s work <span className="kw">together</span>
         </h1>
         <p className="muted" style={{ marginTop: 18, fontSize: "1.06rem" }}>
           Want your product in front of people who actually use AI, AI set up in your business, or just have a question?

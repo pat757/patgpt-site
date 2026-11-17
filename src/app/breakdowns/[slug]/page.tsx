@@ -45,7 +45,10 @@ export default async function BreakdownPage({ params }: Props) {
     <section className="view">
       <div className="wrap article">
         <Link className="back" href="/" prefetch>
-          ← All breakdowns
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M19 12H5M11 6l-6 6 6 6" />
+          </svg>
+          All breakdowns
         </Link>
         <div className="meta" style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", fontSize: ".85rem", color: "var(--muted)" }}>
           {/* Same names as the card on the homepage, so the pill and title morph across when a card is tapped. */}

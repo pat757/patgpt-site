@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Arrow } from "@/components/Arrow";
 import pat from "../../../public/pat.jpg";
 
 export const metadata: Metadata = {
@@ -9,15 +10,21 @@ export const metadata: Metadata = {
   alternates: { canonical: "/about" },
 };
 
+// What visitors get, as caption rows; the last one leads to consulting.
+const FIND = [
+  { t: "Tips you can use today", d: "Short, practical AI tricks you can try in the next five minutes." },
+  { t: "Prompt breakdowns", d: "Write-ups on prompts and tools, with the copyable text front and centre." },
+  { t: "Hands-on consulting", d: "Prompt systems, tool audits and automation for teams that want it done properly.", href: "/work-with-me?type=consulting" },
+];
+
 export default function AboutPage() {
   return (
     <section className="view" aria-labelledby="about-h">
       <div className="wrap">
         <div className="about-top">
           <div className="prose">
-            <p className="eyebrow">About</p>
             <h1 className="pageh" id="about-h">
-              Why Pat Automates exists
+              Why Pat Automates <span className="kw">exists</span>
             </h1>
             <p>
               I&apos;m Patrick Holmes, Pat for short. Pat Automates is where I keep the stuff that actually works: prompts I use
@@ -30,31 +37,42 @@ export default function AboutPage() {
             </p>
             <p>
               If you&apos;d rather have someone build this for your team than read about it, that&apos;s what{" "}
-              <Link href="/work-with-me?type=consulting" style={{ color: "var(--accent-text)" }}>
-                the consulting page
-              </Link>{" "}
-              is for.
+              <Link href="/work-with-me?type=consulting">the consulting page</Link> is for.
             </p>
           </div>
-          <Image className="portrait" src={pat} alt="Patrick Holmes, creator of Pat Automates" priority sizes="(max-width: 820px) 300px, 400px" />
-        </div>
-        <h2 className="about-sub">What you&apos;ll find here</h2>
-        <div className="cards">
-          <div className="card">
-            <h3>Tips you can use today</h3>
-            <p>Short, practical AI tricks you can try in the next five minutes.</p>
+          <div className="portrait-reel">
+            <Image className="portrait" src={pat} alt="Patrick Holmes, creator of Pat Automates" priority sizes="(max-width: 820px) 420px, 380px" />
+            <p className="cap-line" aria-hidden="true">
+              I&apos;m <span className="kw">Pat.</span>
+            </p>
           </div>
-          <div className="card">
-            <h3>Prompt breakdowns</h3>
-            <p>Write-ups on prompts and tools, with the copyable text front and centre.</p>
-          </div>
-          <Link className="card card-link" href="/work-with-me?type=consulting">
-            <h3>
-              Hands-on consulting <span aria-hidden="true">↗</span>
-            </h3>
-            <p>Prompt systems, tool audits and automation for teams that want it done properly.</p>
-          </Link>
         </div>
+
+        <section className="find" aria-labelledby="find-h">
+          <h2 className="cap" id="find-h">
+            What you&apos;ll find <span className="kw">here</span>
+          </h2>
+          <ul className="find-list">
+            {FIND.map((f) => (
+              <li key={f.t}>
+                {f.href ? (
+                  <Link className="row" href={f.href}>
+                    <span className="t">{f.t}</span>
+                    <span className="d">{f.d}</span>
+                    <span className="go">
+                      <Arrow />
+                    </span>
+                  </Link>
+                ) : (
+                  <div className="row">
+                    <span className="t">{f.t}</span>
+                    <span className="d">{f.d}</span>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
     </section>
   );

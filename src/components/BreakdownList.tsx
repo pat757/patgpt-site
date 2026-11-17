@@ -126,7 +126,7 @@ export function BreakdownList({ posts, isAdmin, error }: { posts: Breakdown[]; i
       )}
 
       <div className="listhead">
-        <h2>Latest breakdowns</h2>
+        <h2>Newest first</h2>
         <span className="listhead-r">
           {isAdmin && (
             <Link className="new" href="/admin">

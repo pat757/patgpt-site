@@ -4,8 +4,9 @@ export default function NotFound() {
   return (
     <section className="view">
       <div className="wrap notfound">
-        <p className="eyebrow">404</p>
-        <h1 className="pageh">That page isn&apos;t here</h1>
+        <h1 className="pageh">
+          That page isn&apos;t <span className="kw">here</span>
+        </h1>
         <p className="muted" style={{ marginTop: 18 }}>
           It may have been moved or deleted. The latest breakdowns are on the home page.
         </p>
